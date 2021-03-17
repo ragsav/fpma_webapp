@@ -1,7 +1,20 @@
 .App {
+  
+  overflow: scroll;
+  padding: 10px;
   text-align: center;
+  /* background-color: #000; */
+  background-image: radial-gradient(#fbfbfbb6 1px, transparent 4%);
+  background-color: rgb(42, 43, 45);
+  background-position: 0 0, 35px 35px;
+  background-size: 35px 35px;
+  
+  
 }
 
+html, body, #root, .App {
+  height: 100%;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
