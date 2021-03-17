@@ -26,7 +26,7 @@ const WatchListTile = (props) => {
               textAlign: "left",
               fontSize: 12,
               padding: 4,
-              margin: 0,
+              margin: "auto",
             }}
           >
             {props.watch_list_symbol}
@@ -43,8 +43,8 @@ const WatchListTile = (props) => {
             <Button
               variant="danger"
               style={{
-                padding: "0px 8px 0px 8px",
-                margin: 0,
+                padding: 4,
+                margin: 5,
               }}
               onClick={() => {
                 props.removeFromWishList(props.watch_list_symbol);

@@ -13,12 +13,9 @@ import { connect } from "react-redux";
 import { logoutUser } from "../actions";
 import NavBar from "./navBar";
 import UserCard from "./userCard";
-import TabHolder from "./tab-holder/tabHolder";
 import SearchBar from "./search-bar/searchBar";
 import ChartComponent from "./charts";
-import TransactionForm from "./transactionForm";
 import { db } from "../firebase/firebase";
-import CommentaryForm from "./commentaryForm";
 import TransactionsDisplay from "./tab-holder/transactionsDisplay";
 import RecommendationDisplay from "./tab-holder/recommendationDisplay";
 import WatchListDisplay from "./tab-holder/watchListDisplay";
@@ -150,6 +147,24 @@ const Home = (props) => {
         successToast("Transaction added");
         setUser(user);
         setTransactions(largerArray);
+      })
+      .catch((error) => {
+        errorToast("Oops! Something went wrong");
+      });
+  }
+  function removeFromTransactions(date) {
+    var largerArray = [...user.transactions];
+    largerArray = largerArray.filter((e) => e.date !== date);
+    user.transactions = [...largerArray];
+    console.log(user);
+    db.collection("users")
+      .doc(user.user_id)
+      .update("transactions", largerArray)
+      .then((val) => {
+        // console.log(user);
+        setUser(user);
+        setTransactions(largerArray);
+        successToast(`Transaction removed`);
       })
       .catch((error) => {
         errorToast("Oops! Something went wrong");
@@ -338,6 +353,7 @@ const Home = (props) => {
                       ></RecommendationDisplay>
                     ) : (
                       <TransactionsDisplay
+                        removeFromTransactions={removeFromTransactions}
                         transactions={transactions}
                       ></TransactionsDisplay>
                     )}

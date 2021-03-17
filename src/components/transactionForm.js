@@ -36,7 +36,7 @@ const TransactionForm = (props) => {
           <Form.Control
             type="number"
             placeholder="Shares purchased"
-            value={shares}
+            // value={shares}
             onChange={(e) => {
               setShares(e.target.value);
             }}
@@ -46,7 +46,7 @@ const TransactionForm = (props) => {
           <Form.Control
             type="text"
             placeholder="Value of share"
-            value={pricePerShare}
+            // value={pricePerShare}
             onChange={(e) => {
               setPricePerShare(e.target.value);
             }}
