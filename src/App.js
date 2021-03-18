@@ -13,7 +13,7 @@ function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
     <div className="App">
-      <Container style={{ padding: 0, width: 1000 }} fluid>
+      <Container style={{ padding: 0, width: 1200 }} fluid>
         <Switch>
           <ProtectedRoute
             exact

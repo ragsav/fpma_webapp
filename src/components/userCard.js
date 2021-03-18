@@ -8,7 +8,7 @@ import TransactionForm from "./transactionForm";
 
 function QuizModal(props) {
   return (
-    <Modal {...props} size="md" centered>
+    <Modal {...props} size="lg" centered>
       <Modal.Header closeButton>Risk Survey</Modal.Header>
       <Modal.Body>
         <Quiz
@@ -38,7 +38,7 @@ function CommentaryModal(props) {
     <Modal {...props} size="md" centered>
       <Modal.Header closeButton>Commentary Form</Modal.Header>
       <Modal.Body>
-        <CommentaryForm onHide={props.onHide}></CommentaryForm>
+        <CommentaryForm onHide={props.onHide} uid={props.uid}></CommentaryForm>
       </Modal.Body>
     </Modal>
   );
@@ -48,7 +48,10 @@ function RecommendationModal(props) {
     <Modal {...props} size="md" centered>
       <Modal.Header closeButton>Recommendation Form</Modal.Header>
       <Modal.Body>
-        <RecommendationForm onHide={props.onHide}></RecommendationForm>
+        <RecommendationForm
+          onHide={props.onHide}
+          uid={props.uid}
+        ></RecommendationForm>
       </Modal.Body>
     </Modal>
   );
@@ -215,6 +218,7 @@ const UserCard = (props) => {
             </Button>
             <CommentaryModal
               show={commentaryModalShow}
+              uid={props.user.user_id}
               onHide={() => setCommentaryModalShow(false)}
             />
           </Col>
@@ -316,6 +320,7 @@ const UserCard = (props) => {
             </Button>
             <RecommendationModal
               show={recommendationModalShow}
+              uid={props.user.user_id}
               onHide={() => setRecommendationModalShow(false)}
             />
           </Col>

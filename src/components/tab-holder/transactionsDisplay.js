@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Card, Row, Button } from "react-bootstrap";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import { db } from "../../firebase/firebase";
 
 const TransactionTile = (props) => {
   const t = props.transaction;
   var d = new Date(1970, 0, 1); // Epoch
   d.setSeconds(t["date"].seconds);
 
-  console.log(props);
+  // console.log(props);
 
   return (
     <Card
       style={{
-        // backgroundColor: "white",
-        border: "1px solid green",
+        backgroundColor: t.buy === false ? "#c9ffd8" : "#fffea8",
+        border: t.buy === false ? `2px solid green` : `2px solid orange`,
         width: "100%",
         margin: 0,
         padding: 0,
@@ -81,7 +82,7 @@ const TransactionTile = (props) => {
           </Col>
           <Col
             style={{
-              width:    100,
+              width: 100,
               fontWeight: "700",
               textAlign: "right",
               fontSize: 12,
@@ -92,14 +93,13 @@ const TransactionTile = (props) => {
             <Button
               variant="danger"
               style={{
-                
                 padding: 4,
                 margin: 10,
               }}
               onClick={(e) => {
                 e.preventDefault();
-                console.log(t.date + " to be removed");
-                props.removeFromTransactions(t.date);
+                console.log(props.index + " to be removed");
+                props.removeFromTransactions(parseInt( props.index));
               }}
             >
               <DeleteOutlineIcon></DeleteOutlineIcon>
@@ -111,12 +111,42 @@ const TransactionTile = (props) => {
   );
 };
 const TransactionsDisplay = (props) => {
+  const [transactions,setTransactions]=useState(
+    props.realTime ? null : props.transactions
+  );
   useEffect(() => {
-    //
-  }, [props.transactions]);
+    if(props.realTime){
+      const doc = db.collection("users").doc(props.uid);
+      const observer = doc.onSnapshot(
+        (docSnapshot) => {
+          //   console.log();
+          var user = docSnapshot.data();
+          setTransactions(user.transactions);
+        },
+        (err) => {
+          console.log(`Encountered error: ${err}`);
+        }
+      );
+      return observer;
+    }
+  });
 
-  console.log(props);
-  return props.transactions ? (
+  // function removeFromTransactions(date) {
+  //   var largerArray = [...transactions];
+  //   largerArray = largerArray.filter((e) => e.date !== date);
+
+    
+  //   db.collection("users")
+  //     .doc(props.uid)
+  //     .update("transactions", largerArray)
+  //     .then((val) => {
+  //       successToast(`Transaction removed`);
+  //     })
+  //     .catch((error) => {
+  //       errorToast("Oops! Something went wrong");
+  //     });
+  // }
+  return transactions ? (
     <Container
       style={{
         backgroundColor: "white",
@@ -124,7 +154,7 @@ const TransactionsDisplay = (props) => {
         padding: 0,
       }}
     >
-      {props.transactions.map((t, i) => {
+      {transactions.map((t, i) => {
         // console.log(t);
         // console.log(i);
         return (
@@ -137,6 +167,7 @@ const TransactionsDisplay = (props) => {
           >
             <TransactionTile
               transaction={t}
+              index={i}
               removeFromTransactions={props.removeFromTransactions}
             ></TransactionTile>
           </Row>

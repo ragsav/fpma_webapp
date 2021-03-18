@@ -1,17 +1,33 @@
 import { Card, Form, Button, Col, Row } from "react-bootstrap";
 import { useState } from "react";
 import DatePicker from "react-date-picker";
+const axios = require("axios");
 const CommentaryForm = (props) => {
   const [symbol, setSymbol] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   function handleSubmit(e) {
     e.preventDefault();
-    // props.addTransaction({ symbol, shares, pricePerShare, date, buy });
+    axios
+      .post("https://morning-sea-27341.herokuapp.com/api/prediction", {
+        uid: props.uid,
+        st_name: symbol,
+        start: `${startDate.getFullYear()} ${startDate.getMonth()} ${startDate.getDay()}`,
+        end: `${endDate.getFullYear()} ${endDate.getMonth()} ${endDate.getDay()}`,
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    
   }
   function handleClear(e) {
     e.preventDefault();
-    setDate(new Date());
+    setStartDate(new Date());
+    setEndDate(new Date());
     setSymbol("");
   }
   return (
@@ -37,10 +53,20 @@ const CommentaryForm = (props) => {
         <Form.Group>
           <DatePicker
             onChange={(e) => {
-              setDate(e);
+              setStartDate(e);
             }}
-            value={date}
+            value={startDate}
           />
+          <Form.Label style={{ margin: 5 }}>Start date</Form.Label>
+        </Form.Group>
+        <Form.Group>
+          <DatePicker
+            onChange={(e) => {
+              setEndDate(e);
+            }}
+            value={endDate}
+          />
+          <Form.Label style={{ margin: 5 }}>End date</Form.Label>
         </Form.Group>
 
         <Row style={{ padding: 0, margin: 0, verticalAlign: "bottom" }}>

@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Card, Row, Button } from "react-bootstrap";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import { db } from "../../firebase/firebase";
+
 
 const WatchListTile = (props) => {
   return (
     <Card
       style={{
-        // backgroundColor: "white",
-        border: "1px solid green",
+        backgroundColor: "#c9ffd8",
+        border: `2px solid green`,
         width: "100%",
         margin: 0,
         padding: 0,
@@ -59,11 +61,43 @@ const WatchListTile = (props) => {
   );
 };
 const WatchListDisplay = (props) => {
+  const [watch_list_symbols, setWatchListSymbols] = useState(
+    props.realTime ? null : props.watch_list_symbols
+  );
   useEffect(() => {
-    //
-  }, [props.watch_list_symbols]);
+    if(props.realTime){
+      const doc = db.collection("users").doc(props.uid);
+      const observer = doc.onSnapshot(
+        (docSnapshot) => {
+            console.log("watch list const updating");
+          var user = docSnapshot.data();
+          setWatchListSymbols(user.watch_list_symbols);
+        },
+        (err) => {
+          console.log(`Encountered error: ${err}`);
+        }
+      );
+      return observer;
+    }
+    
+  });
 
-  return props.watch_list_symbols ? (
+  // function removeFromWishList(sym) {
+  //   var largerArray = [...watch_list_symbols];
+  //   largerArray = largerArray.filter((e) => e !== sym);
+    
+    
+  //   db.collection("users")
+  //     .doc(props.uid)
+  //     .update("watch_list_symbols", largerArray)
+  //     .then((val) => {
+  //       successToast(`${sym} removed from watch list`);
+  //     })
+  //     .catch((error) => {
+  //       errorToast("Oops! Something went wrong");
+  //     });
+  // }
+  return watch_list_symbols ? (
     <Container
       style={{
         backgroundColor: "white",
@@ -71,7 +105,7 @@ const WatchListDisplay = (props) => {
         padding: 0,
       }}
     >
-      {props.watch_list_symbols.map((w, i) => {
+      {watch_list_symbols.map((w, i) => {
         return (
           <Row
             key={i}

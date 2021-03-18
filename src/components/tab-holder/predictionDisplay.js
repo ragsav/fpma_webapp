@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Card, Row } from "react-bootstrap";
 import { db } from "../../firebase/firebase";
-const RecommendationTile = (props) => {
-  var r = props.recommendation.split(",");
-  var sym = r[0];
-  var w = Math.round(parseFloat(r[1]) * 100);
-  var ret = parseFloat(r[2]) * 252;
-  var risk = parseFloat(r[3]) * Math.sqrt(252);
-  
+const PredictionTile = (props) => {
+  const p = props.prediction;
+  var start = new Date(1970, 0, 1);
+  var end = new Date(1970, 0, 1); // Epoch
+  start.setSeconds(p["start_date"].seconds);
+  end.setSeconds(p["end_date"].seconds);
   return (
     <Card
       style={{
-        backgroundColor: "#c9ffd8",
-        border: `2px solid green`,
-        // backgroundColor: "#ffd6d6",
-        // border: `2px solid red`,
-
+        backgroundColor: p.prediction === "SELL" ? "#c9ffd8" : "#fffea8",
+        border:
+          p.prediction === "SELL" ? `2px solid green` : `2px solid orange`,
         width: "100%",
         margin: 0,
         padding: 0,
@@ -37,7 +34,7 @@ const RecommendationTile = (props) => {
               margin: 0,
             }}
           >
-            {sym}
+            {p.stock_name}
           </Col>
           <Col
             style={{
@@ -48,7 +45,7 @@ const RecommendationTile = (props) => {
               margin: 0,
             }}
           >
-            {w}
+            {start.toDateString()}
           </Col>
         </Row>
         <Row
@@ -60,34 +57,31 @@ const RecommendationTile = (props) => {
           <Col
             style={{ textAlign: "left", fontSize: 12, padding: 4, margin: 0 }}
           >
-            {`Returns for one year : ${ret}`}
+            {p.prediction}
           </Col>
           <Col
             style={{ textAlign: "right", fontSize: 12, padding: 4, margin: 0 }}
           >
-            {`Risk for one year : ${risk}`}
+            {end.toDateString()}
           </Col>
         </Row>
       </Container>
     </Card>
   );
 };
-const RecommendationDisplay = (props) => {
-  
-
-  const [recommendation_list, setRecommendationList] = useState(
-    props.realTime ? null : props.recommendation_list
+const PredictionDisplay = (props) => {
+  const [predictions, setPredictions] = useState(
+    props.realTime ? null : props.prediction_data
   );
-  
 
   useEffect(() => {
     if (props.realTime) {
       const doc = db.collection("users").doc(props.uid);
       const observer = doc.onSnapshot(
         (docSnapshot) => {
-          //   console.log();
+          console.log("Constant updating");
           var user = docSnapshot.data();
-          setRecommendationList(user.recommendation_list);
+          setPredictions(user.prediction_data);
         },
         (err) => {
           console.log(`Encountered error: ${err}`);
@@ -96,9 +90,8 @@ const RecommendationDisplay = (props) => {
       return observer;
     }
   });
-  
 
-  return recommendation_list ? (
+  return predictions ? (
     <Container
       style={{
         backgroundColor: "white",
@@ -106,7 +99,7 @@ const RecommendationDisplay = (props) => {
         padding: 0,
       }}
     >
-      {recommendation_list.map((r, i) => {
+      {predictions.map((p, i) => {
         return (
           <Row
             key={i}
@@ -115,11 +108,11 @@ const RecommendationDisplay = (props) => {
               padding: 0,
             }}
           >
-            <RecommendationTile recommendation={r}></RecommendationTile>
+            <PredictionTile prediction={p}></PredictionTile>
           </Row>
         );
       })}
     </Container>
   ) : null;
 };
-export default RecommendationDisplay;
+export default PredictionDisplay;

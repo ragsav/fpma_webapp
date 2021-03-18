@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { db } from "../../firebase/firebase";
 
 const Quiz = (props) => {
   var userInputArray = new Array(props.quiz.questions.length).fill(0);
@@ -7,7 +8,7 @@ const Quiz = (props) => {
   const [userInput, setUserInput] = useState(userInputArray);
   console.log(props.quiz.questions);
   return (
-    <Form>
+    <Form style={{ height: 400, overflowY: "scroll" }}>
       {props.quiz.questions.map((q, i) => {
         console.log(q.answers);
         const answers = q.answers;
@@ -49,6 +50,9 @@ const Quiz = (props) => {
           e.preventDefault();
           console.log(userInputArray);
           props.updateRiskScore(userInput);
+          // db.collection("user")
+          //   .doc("bgeKLVR19KQ31Sxz3B99GVYaAS82")
+          //   .update("riskScore", userInput);
           props.onHide();
         }}
       >
