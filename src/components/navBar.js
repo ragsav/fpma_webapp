@@ -17,11 +17,18 @@ const NavBar = (props) => {
     <Navbar
       collapseOnSelect
       expand="lg"
-      bg="dark"
-      variant="dark"
-      style={{ width: "100%", textAlign: "left" }}
+      style={{
+        width: "100%",
+        textAlign: "left",
+        borderRadius: 4,
+        backgroundColor: "rgb(72, 47, 95)",
+      }}
     >
-      <Navbar.Brand href="#home">FPMA</Navbar.Brand>
+      <Navbar.Brand href="#home" style={{  color:  "white"  }}>
+        
+        FPMA
+      
+      </Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto"></Nav>

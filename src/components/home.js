@@ -6,32 +6,24 @@ import {
   Button,
   ButtonGroup,
   Card,
-  ToggleButton,
 } from "react-bootstrap";
 
 import { toast } from "react-toastify";
 import { connect } from "react-redux";
 import { logoutUser } from "../actions";
 import NavBar from "./navBar";
-import UserCard from "./userCard";
+import UserCard from "./user-section/userCard";
 import SearchBar from "./search-bar/searchBar";
-import ChartComponent from "./charts";
 import { db } from "../firebase/firebase";
-import TransactionsDisplay from "./tab-holder/transactionsDisplay";
-import RecommendationDisplay from "./tab-holder/recommendationDisplay";
-import WatchListDisplay from "./tab-holder/watchListDisplay";
-import Report, { companyWiseStatus } from "./report/reportDisplay";
-import CompanyWiseStatus from "./report/companyWiseStatus";
-import { extractCompanyWiseReturn } from "./report/algorithms";
-import PredictionDisplay from "./tab-holder/predictionDisplay";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Switch from "@material-ui/core/Switch";
+import Report from "./report/reportDisplay";
+import CandleStick from "./charts/candleStick";
+import LineChart from "./charts/lineChart";
+import TabHolder from "./tab-holder/tabHolder";
 
 
 const successToast = (msg) => {
   return toast.success(msg, {
-    position: "bottom-center",
+    position: "top-center",
     autoClose: 4000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -43,7 +35,7 @@ const successToast = (msg) => {
 
 const errorToast = (msg) => {
   return toast.error(msg, {
-    position: "bottom-center",
+    position: "top-center",
     autoClose: 4000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -56,39 +48,13 @@ const errorToast = (msg) => {
 const Home = (props) => {
 
   const [user, setUser] = useState(null);
-  const [currentSymbol, setCurrentSymbol] = useState("goog");
-  const [watch_list_symbols, setWatchListSymbols] = useState(null);
-  const [transactions, setTransactions] = useState(null);
-  const [recommendation_list, setRecommendationList] = useState(null);
-  const [prediction_data,setPredictionData]=useState(null);
-  const [riskScore, setRiskScore] = useState(null);
-  const [activeTab, setActiveTab] = useState(2);
-  const [realTime, setRealTime] = useState(false);
+  const [currentSymbol, setCurrentSymbol] = useState("500087.BSE");
+  const [chartType, setChartType] = useState("both");
 
 
   function handleLogout() {
     const { dispatch } = props;
     dispatch(logoutUser());
-  }
-
-  function onTransactionClick(e) {
-    e.preventDefault();
-    setActiveTab(2);
-  }
-
-  function onPredictionClick(e) {
-    e.preventDefault();
-    setActiveTab(3);
-  }
-
-  function onWatchListClick(e) {
-    e.preventDefault();
-    setActiveTab(0);
-  }
-
-  function onRecommendationClick(e) {
-    e.preventDefault();
-    setActiveTab(1);
   }
 
   async function fetchUserFromFireStore() {
@@ -101,7 +67,7 @@ const Home = (props) => {
       } else {
         var dummy = data.data();
         dummy.email = props.user.email;
-        setUser(dummy);
+        setUser({...dummy});
       }
     }
   }
@@ -110,57 +76,59 @@ const Home = (props) => {
     fetchUserFromFireStore();
   }, [props.user]);
 
-  useEffect(() => {
-    console.log("User changed ");
-    console.log(user);
-    if (user != null) {
-      setWatchListSymbols(user.watch_list_symbols);
-      setRecommendationList(user.recommendation_list);
-      setTransactions(user.transactions);
-      setPredictionData(user.prediction_data);
-      setRiskScore(user.riskScore);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   console.log(user);
+  //   if (user != null) {
+  //     setWatchListSymbols(user.watch_list_symbols);
+  //     setTransactions(user.transactions);
+  //   }
+  // }, [user]);
 
   // useEffect(() => {
-  //   extractCompanyWiseReturn(transactions);
+  //   console.log("watch list changed");
+  // }, [watch_list_symbols]);
+  // useEffect(() => {
+  //   console.log("transaction list changed");
   // }, [transactions]);
+  // useEffect(() => {
+  //   console.log("prediction list changed");
+  // }, [prediction_data]);
+  // useEffect(() => {
+  //   console.log("recommended list changed");
+  // }, [recommendation_list]);
 
   function addToWatchList(sym) {
     var largerArray = [];
-    if (user && watch_list_symbols) {
-      largerArray = [...watch_list_symbols];
+    if (user && user.watch_list_symbols) {
+      largerArray = [...user.watch_list_symbols];
     }
     
     largerArray.push(sym);
     user.watch_list_symbols = [...largerArray];
-    // console.log(user);
     db.collection("users")
       .doc(user.user_id)
       .update("watch_list_symbols", largerArray)
       .then((val) => {
-        setUser(user);
-        setWatchListSymbols(largerArray);
+        setUser({...user});
         successToast(`${sym} added to watch list`);
       })
       .catch((error) => {
+        console.log(error)
         errorToast("Oops! Something went wrong");
       });
   }
 
   function removeFromWishList(sym) {
-    var largerArray = [...watch_list_symbols];
+    var largerArray = [...user.watch_list_symbols];
     largerArray = largerArray.filter((e) => e !== sym);
     user.watch_list_symbols = [...largerArray];
-    // console.log(user);
 
     db.collection("users")
       .doc(user.user_id)
       .update("watch_list_symbols", largerArray)
       .then((val) => {
-        // console.log(user);
-        setUser(user);
-        setWatchListSymbols(largerArray);
+
+        setUser({ ...user });        
         successToast(`${sym} removed from watch list`);
       })
       .catch((error) => {
@@ -170,20 +138,19 @@ const Home = (props) => {
 
   function addTransaction(transaction) {
     var largerArray = [];
-    if (user && transactions) {
-      largerArray = [...transactions];
+    if (user && user.transactions) {
+      largerArray = [...user.transactions];
     }
     
     largerArray.push(transaction);
     user.transactions = [...largerArray];
-    // console.log(user);
     db.collection("users")
       .doc(user.user_id)
       .update("transactions", largerArray)
       .then((val) => {
         successToast("Transaction added");
-        setUser(user);
-        setTransactions(largerArray);
+
+        setUser({ ...user });        
       })
       .catch((error) => {
         errorToast("Oops! Something went wrong");
@@ -191,18 +158,15 @@ const Home = (props) => {
   }
 
   function removeFromTransactions(index) {
-    var largerArray = [...transactions];
+    var largerArray = [...user.transactions];
     largerArray.splice(index, 1);
     user.transactions = [...largerArray];
-    console.log(largerArray);
     db.collection("users")
       .doc(user.user_id)
       .update("transactions", largerArray)
       .then((val) => {
-        console.log(val);
         successToast(`Transaction removed`);
-        setUser(user);
-        setTransactions(largerArray);
+        setUser({ ...user });
       })
       .catch((error) => {
         errorToast("Oops! Something went wrong");
@@ -213,23 +177,18 @@ const Home = (props) => {
     var largerArray = [...score];
 
     user.riskScore = [...largerArray];
-    console.log(largerArray);
     db.collection("users")
       .doc(user.user_id)
       .update("riskScore", largerArray)
       .then((val) => {
-        // console.log(val);
         successToast(`Risk score added`);
-        setUser(user);
-        setRiskScore(largerArray);
-        // setTransactions(largerArray);
+        setUser({ ...user });
       })
       .catch((error) => {
         errorToast("Oops! Something went wrong");
       });
   }
 
-  // console.log(props);
   return (
     <Card style={{ width: "100%", padding: 10 }}>
       <Container
@@ -261,9 +220,11 @@ const Home = (props) => {
           </Col>
         </Row>
 
-        <Row style={{ margin: 0, padding: 4 }}>
+        <Row style={{ margin: "auto", padding: 4, width: "70%" }}>
           <Col style={{ margin: 0, padding: 4 }}>
-            <ButtonGroup style={{ padding: 0, width: "70%", marginBottom: 10 }}>
+            <ButtonGroup
+              style={{ padding: 0, width: "100%", marginBottom: 10 }}
+            >
               <Button
                 variant="dark"
                 style={{ paddingTop: 4, paddingBottom: 4, fontSize: 12 }}
@@ -308,153 +269,97 @@ const Home = (props) => {
               </Button>
             </ButtonGroup>
           </Col>
-        </Row>
-
-        <Row style={{ margin: 0, padding: 4 }}>
           <Col style={{ margin: 0, padding: 4 }}>
-            <ChartComponent symbol={currentSymbol}></ChartComponent>
+            <ButtonGroup
+              style={{ padding: 0, width: "100%", marginBottom: 10 }}
+            >
+              <Button
+                variant={chartType === "candle" ? "dark" : "secondary"}
+                style={{ paddingTop: 4, paddingBottom: 4, fontSize: 12 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setChartType("candle");
+                }}
+              >
+                CandleStick
+              </Button>
+              <Button
+                variant={chartType === "line" ? "dark" : "secondary"}
+                style={{ paddingTop: 4, paddingBottom: 4, fontSize: 12 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setChartType("line");
+                }}
+              >
+                Line Chart
+              </Button>
+              <Button
+                variant={chartType === "both" ? "dark" : "secondary"}
+                style={{ paddingTop: 4, paddingBottom: 4, fontSize: 12 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setChartType("both");
+                }}
+              >
+                Both
+              </Button>
+            </ButtonGroup>
           </Col>
         </Row>
 
+
+        {chartType === "line" ? null:(
+          <Row style={{ margin: 0, padding: 4 }} >
+            <Col style={{ margin: 0, padding: 4 }}>
+              <Card style={{ padding: 0, margin: 0, borderWidth: 2 }}>
+                <CandleStick symbol={currentSymbol}></CandleStick>
+              </Card>
+            </Col>
+          </Row>
+        ) }
+        {chartType === "candle" ? null:(
+          <Row style={{ margin: 0, padding: 4 }}>
+            <Col style={{ margin: 0, padding: 4 }}>
+              <Card style={{ padding: 0, margin: 0, borderWidth: 2 }}>
+                <LineChart symbol={currentSymbol}></LineChart>
+              </Card>
+            </Col>
+          </Row>
+        )}
+
+
         <Row style={{ margin: 0, padding: 4 }}>
           <Col style={{ margin: 0, padding: 4 }}>
-            <UserCard
+            {user?<UserCard
               user={user}
               addTransaction={addTransaction}
               updateRiskScore={updateRiskScore}
-            ></UserCard>
+            ></UserCard>:null}
           </Col>
         </Row>
+
 
         <Row style={{ margin: 0, padding: 4 }}>
           <Col style={{ margin: 0, padding: 4 }}>
-            {user ? (
-              <Card
-                style={{
-                  borderWidth: 2,
-                  backgroundColor: "white",
-                  margin: 0,
-                  marginTop: 10,
-                  padding: 10,
-                  width: "100%",
+            {user ?<TabHolder user = {user} removeFromWishList = {removeFromWishList} removeFromTransactions = {removeFromTransactions}>
 
-                  borderRadius: 4,
-                }}
-              >
-                <Row style={{ margin: 0, padding: 4 }}>
-                  <Col style={{ margin: 0, padding: 4 }}>
-                    <FormControlLabel
-                      style={{ float: "left" }}
-                      control={
-                        <Switch
-                          checked={realTime}
-                          name="jason"
-                          onChange={() => {
-                            setRealTime(!realTime);
-                          }}
-                        />
-                      }
-                      label="Set realtime update?"
-                    />
-                  </Col>
-                </Row>
-                <Container style={{ margin: 0, padding: 0 }}>
-                  <Row style={{ margin: 0, padding: 0 }}>
-                    <ButtonGroup
-                      style={{ padding: 0, width: "100%", fontSize: 7 }}
-                    >
-                      <Button
-                        variant={activeTab === 0 ? "outline-dark" : "dark"}
-                        style={{
-                          paddingTop: 4,
-                          paddingBottom: 4,
-                          width: "33%",
-                          fontSize: 12,
-                        }}
-                        onClick={onWatchListClick}
-                      >
-                        Watch List
-                      </Button>
-                      <Button
-                        variant={activeTab === 1 ? "outline-dark" : "dark"}
-                        style={{
-                          paddingTop: 4,
-                          paddingBottom: 4,
-                          fontSize: 12,
-                          width: "33%",
-                        }}
-                        onClick={onRecommendationClick}
-                      >
-                        Recommendation List
-                      </Button>
-                      <Button
-                        variant={activeTab === 2 ? "outline-dark" : "dark"}
-                        style={{
-                          paddingTop: 4,
-                          paddingBottom: 4,
-                          width: "33%",
-                          fontSize: 12,
-                        }}
-                        onClick={onTransactionClick}
-                      >
-                        Transactions
-                      </Button>
-                      <Button
-                        variant={activeTab === 3 ? "outline-dark" : "dark"}
-                        style={{
-                          paddingTop: 4,
-                          paddingBottom: 4,
-                          width: "33%",
-                          fontSize: 12,
-                        }}
-                        onClick={onPredictionClick}
-                      >
-                        Predictions
-                      </Button>
-                    </ButtonGroup>
-                  </Row>
-                  <Row style={{ margin: 0, padding: 0, marginTop: 20 }}>
-                    {activeTab === 0 ? (
-                      <WatchListDisplay
-                        removeFromWishList={removeFromWishList}
-                        uid={user.user_id}
-                        realTime={realTime}
-                        watch_list_symbols={watch_list_symbols}
-                      ></WatchListDisplay>
-                    ) : activeTab === 1 ? (
-                      <RecommendationDisplay
-                        uid={user.user_id}
-                        realTime={realTime}
-                        recommendation_list={recommendation_list}
-                      ></RecommendationDisplay>
-                    ) : activeTab === 2 ? (
-                      <TransactionsDisplay
-                        transactions={transactions}
-                        removeFromTransactions={removeFromTransactions}
-                        uid={user.user_id}
-                        realTime={realTime}
-                      ></TransactionsDisplay>
-                    ) : (
-                      <PredictionDisplay
-                        prediction_data={prediction_data}
-                        uid={user.user_id}
-                        realTime={realTime}
-                      ></PredictionDisplay>
-                    )}
-                  </Row>
-                </Container>
-              </Card>
-            ) : null}
-          </Col>
+            </TabHolder>:null}
+            </Col>
         </Row>
 
+      
         <Row style={{ margin: 0, padding: 4 }}>
           <Col style={{ margin: 0, padding: 4 }}>
-            <Card style={{ padding: 0, margin: 0, borderWidth: 2 }}>
-              <Report transactions={transactions}></Report>
-            </Card>
+            {user?<Card style={{ padding: 0, margin: 0, borderWidth: 2 }}>
+              <Report
+                transactions={user.transactions}
+                recommended_stocks={user.recommended_stocks}
+                recommended_stock_weights={user.recommended_stock_weights}
+              ></Report>
+            </Card>:null}
           </Col>
         </Row>
+
       </Container>
     </Card>
   );

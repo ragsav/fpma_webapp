@@ -1,11 +1,22 @@
-import { Col, Container, Row } from "react-bootstrap";
+import { useEffect ,useState} from "react";
+import { Col, Container, Row, Card } from "react-bootstrap";
 import { extractCompanyWiseReturn } from "./algorithms";
 import CompanyWiseStatus from "./companyWiseStatus";
+import RecStocksTree from "./recommendedStocksTree";
+import RecStockWeigthChart from "./recommendedStockWeightsChart";
 
 const Report = (props) => {
-  var company_returns = extractCompanyWiseReturn(props.transactions);
+
+  const [company_returns, setCompanyReturns] = useState(
+    extractCompanyWiseReturn(props.transactions)
+  );
+  useEffect(()=>{
+    setCompanyReturns(extractCompanyWiseReturn(props.transactions));
+  },[props.transactions])
   return company_returns ? (
-    <Container style={{ padding: 0, margin: 0 }}>
+    <Container
+      style={{ padding: 0, margin: 0, paddingTop: 30, paddingBottom: 30 }}
+    >
       <Row style={{ padding: 2, margin: 0 }}>
         <Col style={{ padding: 0, margin: 0 }}>
           <CompanyWiseStatus
@@ -31,6 +42,33 @@ const Report = (props) => {
             title={"Balance stocks"}
           ></CompanyWiseStatus>
         </Col>
+      </Row>
+      <Row
+        style={{
+          margin: 0,
+          padding: 0,
+          marginTop: 30,
+          marginBottom: 30,
+        }}
+      >
+        <Card
+          style={{
+            margin: 0,
+            height: 1,
+            width: "100%",
+          }}
+        ></Card>
+      </Row>
+      <Row style={{ padding: 2, margin: 0 }}>
+        <Col style={{ padding: 0, margin: 0 }}>
+          <RecStockWeigthChart
+            recommended_stock_weights={props.recommended_stock_weights}
+          ></RecStockWeigthChart>
+        </Col>
+        <Col style={{ padding: 0, margin: 0 }}>
+          <RecStocksTree recommended_stocks={props.recommended_stocks}></RecStocksTree>
+        </Col>
+        
       </Row>
     </Container>
   ) : null;

@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Card, Row, Button, Modal } from "react-bootstrap";
 import CommentaryForm from "./commentaryForm";
-import { quiz } from "./quiz";
-import Quiz from "./quiz-component/quiz";
+import { quiz } from "./quizData";
+import Quiz from "./quiz";
 import RecommendationForm from "./recommendationForm";
 import TransactionForm from "./transactionForm";
 
 function QuizModal(props) {
   return (
     <Modal {...props} size="lg" centered>
-      <Modal.Header closeButton>Risk Survey</Modal.Header>
+      <Modal.Header closeButton style={{ fontWeight: "700" }}>
+        Risk Survey
+      </Modal.Header>
       <Modal.Body>
         <Quiz
           quiz={quiz}
@@ -23,7 +25,9 @@ function QuizModal(props) {
 function TransactionModal(props) {
   return (
     <Modal {...props} size="md" centered>
-      <Modal.Header closeButton>TransactionForm</Modal.Header>
+      <Modal.Header closeButton style={{ fontWeight: "700" }}>
+        TransactionForm
+      </Modal.Header>
       <Modal.Body>
         <TransactionForm
           onHide={props.onHide}
@@ -36,7 +40,9 @@ function TransactionModal(props) {
 function CommentaryModal(props) {
   return (
     <Modal {...props} size="md" centered>
-      <Modal.Header closeButton>Commentary Form</Modal.Header>
+      <Modal.Header closeButton style={{ fontWeight: "700" }}>
+        Commentary Form
+      </Modal.Header>
       <Modal.Body>
         <CommentaryForm onHide={props.onHide} uid={props.uid}></CommentaryForm>
       </Modal.Body>
@@ -46,7 +52,9 @@ function CommentaryModal(props) {
 function RecommendationModal(props) {
   return (
     <Modal {...props} size="md" centered>
-      <Modal.Header closeButton>Recommendation Form</Modal.Header>
+      <Modal.Header closeButton style={{ fontWeight: "700" }}>
+        Recommendation Form
+      </Modal.Header>
       <Modal.Body>
         <RecommendationForm
           onHide={props.onHide}

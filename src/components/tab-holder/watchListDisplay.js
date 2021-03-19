@@ -62,14 +62,17 @@ const WatchListTile = (props) => {
 };
 const WatchListDisplay = (props) => {
   const [watch_list_symbols, setWatchListSymbols] = useState(
-    props.realTime ? null : props.watch_list_symbols
+    props.watch_list_symbols
   );
+
   useEffect(() => {
-    if(props.realTime){
+    setWatchListSymbols(props.watch_list_symbols);
+  }, [props.watch_list_symbols]);
+  useEffect(() => {
+    if (props.realTime) {
       const doc = db.collection("users").doc(props.uid);
       const observer = doc.onSnapshot(
         (docSnapshot) => {
-            console.log("watch list const updating");
           var user = docSnapshot.data();
           setWatchListSymbols(user.watch_list_symbols);
         },
@@ -79,14 +82,12 @@ const WatchListDisplay = (props) => {
       );
       return observer;
     }
-    
   });
 
   // function removeFromWishList(sym) {
   //   var largerArray = [...watch_list_symbols];
   //   largerArray = largerArray.filter((e) => e !== sym);
-    
-    
+
   //   db.collection("users")
   //     .doc(props.uid)
   //     .update("watch_list_symbols", largerArray)

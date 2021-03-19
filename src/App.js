@@ -6,14 +6,14 @@ import { connect } from "react-redux";
 import ProtectedRoute from "./components/protectedRoutes";
 import Home from "./components/home";
 import Login from "./components/login";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
     <div className="App">
-      <Container style={{ padding: 0, width: 1200 }} fluid>
+      <Container style={{ padding: 0, width: 1200, height: "100%" }} fluid>
         <Switch>
           <ProtectedRoute
             exact

@@ -17,7 +17,6 @@ const SearchBar = (props) => {
   function handleSubmit(e) {
     e.preventDefault();
     alpha.data.search(query).then((data) => {
-      console.log(data.bestMatches);
       setSearchResult(data.bestMatches);
     });
   }
@@ -48,17 +47,17 @@ const SearchBar = (props) => {
         >
           <InputGroup className="mb-3">
             <FormControl
-              placeholder="GOOG"
+              placeholder="500087.BSE"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
               }}
             />
             <InputGroup.Append>
-              <Button variant="dark" onClick={handleAddToWishList}>
+              <Button variant="outline-secondary" onClick={handleAddToWishList}>
                 Add to Wishlist
               </Button>
-              <Button variant="outline-secondary" onClick={handleSubmit}>
+              <Button variant="dark" onClick={handleSubmit}>
                 Search
               </Button>
             </InputGroup.Append>
@@ -81,7 +80,6 @@ const SearchBar = (props) => {
               }}
             >
               {searchResult.map((s, i) => {
-                console.log(s);
                 return (
                   <SearchResult
                     symbol={s["1. symbol"]}
@@ -89,7 +87,6 @@ const SearchBar = (props) => {
                     key={i}
                     onClick={(e) => {
                       e.preventDefault();
-                      console.log(s["1. symbol"]);
                       setCurrentSymbol(s["1. symbol"]);
                       setQuery(s["1. symbol"]);
                       props.setCurrentSymbol(s["1. symbol"]);

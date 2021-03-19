@@ -6,11 +6,9 @@ const Quiz = (props) => {
   var userInputArray = new Array(props.quiz.questions.length).fill(0);
 
   const [userInput, setUserInput] = useState(userInputArray);
-  console.log(props.quiz.questions);
   return (
     <Form style={{ height: 400, overflowY: "scroll" }}>
       {props.quiz.questions.map((q, i) => {
-        console.log(q.answers);
         const answers = q.answers;
         return (
           <div>
@@ -25,7 +23,6 @@ const Quiz = (props) => {
                     id={`default-${i}`}
                     label={`${ans}`}
                     onClick={() => {
-                      console.log("chnaged");
                       userInput[i] = j;
                       setUserInput(userInput);
                     }}
@@ -48,7 +45,6 @@ const Quiz = (props) => {
         }}
         onClick={(e) => {
           e.preventDefault();
-          console.log(userInputArray);
           props.updateRiskScore(userInput);
           // db.collection("user")
           //   .doc("bgeKLVR19KQ31Sxz3B99GVYaAS82")
@@ -63,7 +59,7 @@ const Quiz = (props) => {
           e.preventDefault();
           props.onHide();
         }}
-        variant="dark"
+        variant="outline-danger"
         type="submit"
         style={{
           padding: "2px 16px 2px 16px",

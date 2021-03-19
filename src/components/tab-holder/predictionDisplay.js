@@ -70,16 +70,17 @@ const PredictionTile = (props) => {
   );
 };
 const PredictionDisplay = (props) => {
-  const [predictions, setPredictions] = useState(
-    props.realTime ? null : props.prediction_data
-  );
+  const [predictions, setPredictions] = useState(props.prediction_data);
+
+  useEffect(() => {
+    setPredictions(props.prediction_data);
+  }, [props.prediction_data]);
 
   useEffect(() => {
     if (props.realTime) {
       const doc = db.collection("users").doc(props.uid);
       const observer = doc.onSnapshot(
         (docSnapshot) => {
-          console.log("Constant updating");
           var user = docSnapshot.data();
           setPredictions(user.prediction_data);
         },

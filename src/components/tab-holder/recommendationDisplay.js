@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Card, Row } from "react-bootstrap";
 import { db } from "../../firebase/firebase";
-const RecommendationTile = (props) => {
+export const RecommendationTile = (props) => {
   var r = props.recommendation.split(",");
   var sym = r[0];
   var w = Math.round(parseFloat(r[1]) * 100);
-  var ret = parseFloat(r[2]) * 252;
-  var risk = parseFloat(r[3]) * Math.sqrt(252);
-  
+  var ret = parseFloat(r[2]  ?  r[2]  :  0) * 252;
+  var risk = parseFloat(r[3]  ?  r[3]  :  0) * Math.sqrt(252);
+
   return (
     <Card
       style={{
@@ -76,16 +76,18 @@ const RecommendationDisplay = (props) => {
   
 
   const [recommendation_list, setRecommendationList] = useState(
-    props.realTime ? null : props.recommendation_list
+    props.recommendation_list
   );
   
 
+  useEffect(()=>{
+    setRecommendationList(props.recommendation_list)
+  },[props.recommendation_list])
   useEffect(() => {
     if (props.realTime) {
       const doc = db.collection("users").doc(props.uid);
       const observer = doc.onSnapshot(
         (docSnapshot) => {
-          //   console.log();
           var user = docSnapshot.data();
           setRecommendationList(user.recommendation_list);
         },
@@ -122,4 +124,5 @@ const RecommendationDisplay = (props) => {
     </Container>
   ) : null;
 };
+
 export default RecommendationDisplay;

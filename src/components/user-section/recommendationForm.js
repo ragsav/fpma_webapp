@@ -22,12 +22,9 @@ const RecommendationForm = (props) => {
       p_size: 10,
       iterations: 5,
     };
-    console.log(obj);
     axios
       .post("https://fpma-optimize.herokuapp.com/api/optimise", obj)
-      .then(function (response) {
-        console.log(response);
-      })
+      .then(function (response) {})
       .catch(function (error) {
         console.log(error);
       });

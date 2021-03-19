@@ -62,20 +62,21 @@ class Login extends Component {
 
   render() {
     const { classes, loginError, isAuthenticated } = this.props;
-    console.log(isAuthenticated);
     if (isAuthenticated) {
       return <Redirect to="/" />;
     } else {
       return (
         <Container
           style={{
+            height: "100%",
             margin: "auto",
             padding: 0,
+            justifyContent:    "center",
             textAlign: "center",
-            width: 400,
+            width: "100%",
           }}
         >
-          <Card style={{ margin: 0, padding: 20 }}>
+          <Card style={{ margin: "auto", padding: 20,    width:    400 }}>
             <Form>
               <p>FPMA login</p>
               <Form.Group controlId="formBasicEmail">

@@ -20,8 +20,6 @@ export function companyWiseStatus(transactions) {
     }
     report_map[symbol] = local_symbol_value;
   });
-
-  console.log(report_map);
 }
 export function dateWiseStatus(transactions) {
   transactions.sort(function (a, b) {
@@ -45,8 +43,6 @@ export function dateWiseStatus(transactions) {
     }
     report_map[symbol] = local_symbol_value;
   });
-
-  console.log(report_map);
 }
 
 export function extractCompanyWiseReturn(transactions) {
@@ -104,7 +100,6 @@ export function extractCompanyWiseReturn(transactions) {
     // var return_on_selling_now = 0;
     // if (total_stock_units != 0) {
     //   var symbol_ts_data = await alpha.data.quote(symbol);
-    //   console.log(symbol_ts_data);
     //   var current_share_price;
     // }
     complete_data.symbols.push(symbol);

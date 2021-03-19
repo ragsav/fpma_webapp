@@ -8,7 +8,6 @@ const TransactionTile = (props) => {
   var d = new Date(1970, 0, 1); // Epoch
   d.setSeconds(t["date"].seconds);
 
-  // console.log(props);
 
   return (
     <Card
@@ -98,7 +97,6 @@ const TransactionTile = (props) => {
               }}
               onClick={(e) => {
                 e.preventDefault();
-                console.log(props.index + " to be removed");
                 props.removeFromTransactions(parseInt( props.index));
               }}
             >
@@ -111,15 +109,18 @@ const TransactionTile = (props) => {
   );
 };
 const TransactionsDisplay = (props) => {
-  const [transactions,setTransactions]=useState(
-    props.realTime ? null : props.transactions
-  );
+  
+  
+  const [transactions, setTransactions] = useState(props.transactions);
+  useEffect(() => {
+    setTransactions(props.transactions)
+  }, [props.transactions]);
   useEffect(() => {
     if(props.realTime){
       const doc = db.collection("users").doc(props.uid);
       const observer = doc.onSnapshot(
         (docSnapshot) => {
-          //   console.log();
+          console.log("updating...")
           var user = docSnapshot.data();
           setTransactions(user.transactions);
         },
@@ -131,21 +132,7 @@ const TransactionsDisplay = (props) => {
     }
   });
 
-  // function removeFromTransactions(date) {
-  //   var largerArray = [...transactions];
-  //   largerArray = largerArray.filter((e) => e.date !== date);
-
-    
-  //   db.collection("users")
-  //     .doc(props.uid)
-  //     .update("transactions", largerArray)
-  //     .then((val) => {
-  //       successToast(`Transaction removed`);
-  //     })
-  //     .catch((error) => {
-  //       errorToast("Oops! Something went wrong");
-  //     });
-  // }
+  
   return transactions ? (
     <Container
       style={{
@@ -155,8 +142,6 @@ const TransactionsDisplay = (props) => {
       }}
     >
       {transactions.map((t, i) => {
-        // console.log(t);
-        // console.log(i);
         return (
           <Row
             key={i}
